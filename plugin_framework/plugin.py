@@ -37,3 +37,6 @@ class Plugin:
 
     def activate(self):
         print("Plugin {} activated!".format(self.symbolic_name))
+
+    def __str__(self):
+        return "Plugin: {}, version: {}.".format(self.name, self.version)

@@ -1,6 +1,6 @@
 from plugin_framework.plugin import Plugin
 
-class FirstPlugin(Plugin):
+class Main(Plugin):
     def __init__(self, metadata):
         super().__init__(metadata)
 

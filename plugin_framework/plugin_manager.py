@@ -1,18 +1,30 @@
 import os
 import json
+import importlib
+import inspect
 class PluginManager:
     def __init__(self):
         self._plugins = list()
     
     def install(self, path):
-        # path.replace(os.path.sep, ".")
-        from plugins.first_plugin.plugin import FirstPlugin
-        with open("./plugins/first_plugin/spec.json", "r") as fp:
-            specification = json.load(fp)
-            fp = FirstPlugin(specification)
-            fp.enabled = False
-            self._plugins.append(fp)
-            self.enable(fp.symbolic_name)
+        for root, dirs, files in os.walk(path):
+            for d in dirs:
+                d_path = os.path.join(path, d)
+                spec_path = os.path.join(d_path, "spec.json")
+                plugin_path = os.path.join(d_path, "plugin").replace(os.path.sep,".")
+                if os.path.exists(spec_path):
+                    with open(spec_path, "r") as fp:
+                        specification = json.load(fp)
+                        plugin_module = importlib.import_module(plugin_path)
+                        found = False
+                        for member in inspect.getmembers(plugin_module):
+                            if member[0] == "Main":
+                                inst = plugin_module.Main(specification)
+                                print(inst)
+                                found = True
+                        if not found:
+                            raise ValueError("Main class not found!")
+            break # ne ulazimo u podfoldere
     
     def uninstall(self, symoblic_name):
         return False
