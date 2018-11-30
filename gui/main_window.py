@@ -1,15 +1,18 @@
 from PySide2 import QtWidgets
 from PySide2.QtGui import QIcon
+from gui.dialogs.plugins_dialog import PluginsDialog
 class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, pm=None):
         super().__init__(parent)
         self.setWindowTitle("Univerzitet Singidunum")
         self.setWindowIcon(QIcon("resources/icons/bug.png"))
         self.resize(800, 600)
 
+        self.plugin_manager = pm
         self.action_dict = {
             "open": QtWidgets.QAction(QIcon("resources/icons/folder-open-document.png"), "&Open document..."),
-            "undo": QtWidgets.QAction(QIcon("resources/icons/arrow-curve-180-left.png"), "&Undo")
+            "undo": QtWidgets.QAction(QIcon("resources/icons/arrow-curve-180-left.png"), "&Undo"),
+            "plugin_settings":  QtWidgets.QAction(QIcon("resources/icons/puzzle.png"), "&Plugin settings")
         }
 
         self.menu_bar = QtWidgets.QMenuBar(self)
@@ -18,6 +21,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.file_menu = QtWidgets.QMenu("&File", self.menu_bar)
         self.edit_menu = QtWidgets.QMenu("&Edit", self.menu_bar)
         self.view_menu = QtWidgets.QMenu("&View", self.menu_bar)
+        self.tools_menu = QtWidgets.QMenu("&Tools", self.menu_bar)
         self.help_menu = QtWidgets.QMenu("&Help", self.menu_bar)
 
         self._bind_actions()
@@ -32,6 +36,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def _bind_actions(self):
         self.action_dict["open"].triggered.connect(self._on_open_file)
         self.action_dict["undo"].triggered.connect(self.text_edit.undo)
+        self.action_dict["plugin_settings"].triggered.connect(self._on_plugin_settings)
 
 
     def _bind_shortcuts(self):
@@ -46,16 +51,22 @@ class MainWindow(QtWidgets.QMainWindow):
     def _populate_menu_bar(self):
         self.file_menu.addAction(self.action_dict["open"])
         self.view_menu.addAction(self.tool_bar.toggleViewAction())
+        self.tools_menu.addAction(self.action_dict["plugin_settings"])
         self.edit_menu.addAction(self.action_dict["undo"])
 
         self.menu_bar.addMenu(self.file_menu)
         self.menu_bar.addMenu(self.edit_menu)
         self.menu_bar.addMenu(self.view_menu)
+        self.menu_bar.addMenu(self.tools_menu)
         self.menu_bar.addMenu(self.help_menu)
 
     def _on_open_file(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self, "Open Python script", ".", "Python Files (*.py)")
         with open(file_name[0], "r") as fp:
             self.text_edit.setText(fp.read())
+
+    def _on_plugin_settings(self):
+        dialog = PluginsDialog(self)
+        result = dialog.exec_()
 
 

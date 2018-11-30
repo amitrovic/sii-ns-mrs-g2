@@ -22,11 +22,13 @@ class PluginManager:
                                 inst = plugin_module.Main(specification)
                                 print(inst)
                                 found = True
+                                self._plugins.append(inst)
                         if not found:
                             raise ValueError("Main class not found!")
             break # ne ulazimo u podfoldere
     
     def uninstall(self, symoblic_name):
+        # TODO:
         return False
 
     def enable(self, symoblic_name):
@@ -43,3 +45,19 @@ class PluginManager:
                 plugin.enabled = False
                 return True
         return False
+
+    @property
+    def enabled_plugins(self):
+        enabled = []
+        for plugin in self._plugins:
+            if plugin.enabled:
+                enabled.append(plugin)
+        return enabled
+
+    @property
+    def disabled_plugins(self):
+        return list(filter(lambda x: x.enabled, self._plugins))
+
+    @property
+    def plugins(self):
+        return self._plugins
