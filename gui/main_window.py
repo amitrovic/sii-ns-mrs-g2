@@ -72,4 +72,23 @@ class MainWindow(QtWidgets.QMainWindow):
         # dialog = NewContact(self)
         # result = dialog.exec_()
 
+    def set_central_widget(self, symbolic_name: str):
+        """
+        Podesava centralni widget glavnog prozora, na osnovu simboličkog imena se dobija plugin
+        koji će se smestiti u centralni deo glavnog prozora.
+
+        :param symbolic_name: Simbolicko ime plugina koji želimo da instanciramo.
+        """
+        try:
+
+            plugin = self.plugin_manager.get_by_symbolic_name(symbolic_name)
+            widgets = plugin.get_widget()
+            self.setCentralWidget(widgets[0])
+            if widgets[1] is not None:
+                self.tool_bar.addSeparator()
+                self.tool_bar.addActions(widgets[1].actions())
+            self.menu_bar.addMenu(widgets[2]) if widgets[2] is not None else None
+        except IndexError:
+            print("Ne postoji ni jedan plugin sa zadatim simboličkim imenom!")
+
 

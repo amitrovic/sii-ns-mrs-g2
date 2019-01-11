@@ -39,9 +39,9 @@ class PluginManager:
                 return True
         return False
 
-    def disable(self, symoblic_name):
+    def disable(self, symbolic_name):
         for plugin in self._plugins:
-            if plugin.symbolic_name == symoblic_name and plugin.enabled is True:
+            if plugin.symbolic_name == symbolic_name and plugin.enabled is True:
                 plugin.enabled = False
                 return True
         return False
@@ -61,3 +61,9 @@ class PluginManager:
     @property
     def plugins(self):
         return self._plugins
+
+    def get_by_symbolic_name(self, symbolic_name):
+        """
+        :raises: IndexError - u slucaju kada nije pronadjen ni jedan plugin sa datim simbolickim imenom.
+        """
+        return list(filter(lambda x: x.symbolic_name == symbolic_name, self._plugins))[0]

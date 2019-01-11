@@ -8,22 +8,27 @@ class PluginsDialog(QtWidgets.QDialog):
         self.setWindowTitle("Plugin settings")
         self.resize(600, 400)
 
-        self.parent = parent
         self.plugins_dialog_layout = QtWidgets.QVBoxLayout()
         self.buttons_layout = QtWidgets.QHBoxLayout()
 
+        self.set_plugin_button = QtWidgets.QPushButton(QIcon("resources/icons/application-plus.png"), "Set as central")
         self.uninstall_button = QtWidgets.QPushButton(QIcon("resources/icons/minus-circle.png"), "Uninstall", self)
         self.enable_button = QtWidgets.QPushButton(QIcon("resources/icons/tick.png"), "Enable", self)
         self.disable_button = QtWidgets.QPushButton(QIcon("resources/icons/exclamation-red.png"), "Disable", self)
 
-        self.enable_button.pressed.connect(self._on_enable_plugin)
-        self.disable_button.pressed.connect(self._on_disable_plugin)
+        self.set_plugin_button.clicked.connect(self._on_set)
+        self.enable_button.clicked.connect(self._on_enable_plugin)
+        self.disable_button.clicked.connect(self._on_disable_plugin)
 
+
+        self.buttons_layout.addWidget(self.set_plugin_button)
         self.buttons_layout.addWidget(self.uninstall_button)
         self.buttons_layout.addWidget(self.enable_button)
         self.buttons_layout.addWidget(self.disable_button)
 
         self.plugins_table = QtWidgets.QTableWidget(self)
+        self.plugins_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.plugins_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self._populate_table()
 
         self.button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
@@ -45,9 +50,9 @@ class PluginsDialog(QtWidgets.QDialog):
 
     def _populate_table(self):
         self.plugins_table.setColumnCount(6)
-        self.plugins_table.setRowCount(len(self.parent.plugin_manager.plugins))
+        self.plugins_table.setRowCount(len(self.parent().plugin_manager.plugins))
         self.plugins_table.setHorizontalHeaderLabels(["Name", "Symbolic name", "Description", "Version", "Application version", "Enabled"])
-        for i, plugin in enumerate(self.parent.plugin_manager.plugins):
+        for i, plugin in enumerate(self.parent().plugin_manager.plugins):
             name = QtWidgets.QTableWidgetItem(plugin.name)
             name.setFlags(name.flags()^Qt.ItemIsEditable)
             symbolic_name = QtWidgets.QTableWidgetItem(plugin.symbolic_name)
@@ -66,6 +71,17 @@ class PluginsDialog(QtWidgets.QDialog):
             self.plugins_table.setItem(i, 3, version)
             self.plugins_table.setItem(i, 4, app_version)
             self.plugins_table.setItem(i, 5, enabled)
+    
+    def _on_set(self):
+        """
+        Metoda koja se poziva kada se pritisne na dugme set central.
+        """
+        selected_items = self.plugins_table.selectedItems()
+        if len(selected_items) == 0:
+            return
+        # na drugoj poziciji se nalazi simbolicko ime plugina.
+        symbolic_name = selected_items[1].text()
+        self.parent().set_central_widget(symbolic_name)
 
     def _on_enable_plugin(self):
         selected = self.plugins_table.selectedItems()
