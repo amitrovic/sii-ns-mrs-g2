@@ -1,6 +1,7 @@
 from PySide2 import QtWidgets
 from PySide2.QtGui import QIcon
 from gui.dialogs.plugins_dialog import PluginsDialog
+from plugins.rs_ac_singidunum_imenik.dialogs.new_contact import NewContact
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None, pm=None):
         super().__init__(parent)
@@ -68,5 +69,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_plugin_settings(self):
         dialog = PluginsDialog(self)
         result = dialog.exec_()
+        # dialog = NewContact(self)
+        # result = dialog.exec_()
 
 
